@@ -1,0 +1,170 @@
+﻿@{
+    ViewData["Title"] = "404 - Page Not Found";
+}
+    <title>404 - Page Not Found</title>
+    <style>
+        /* Стили остаются теми же */
+
+        .container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .error-svg {
+            max-width: 400px;
+            width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 24px;
+            background-color: #FF6B6B;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #ff5252;
+        }
+
+        @@media (max-width: 480px) {
+            .error-svg {
+                max-width: 300px;
+            }
+        }
+    </style>
+<div class="container">
+    <svg class="error-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+        <!-- White background -->
+        <rect width="400" height="300" fill="#ffffff"/>
+
+        <!-- First digit group (4) -->
+        <g>
+            <text x="150" y="190" font-size="80" font-family="Arial" font-weight="bold" text-anchor="middle" fill="#f0f0f0">
+                4
+                <animateTransform
+                        attributeName="transform"
+                        type="translate"
+                        values="0 0; 0 -15; 0 0"
+                        dur="2.6s"
+                        begin="0s"
+                        repeatCount="indefinite"/>
+            </text>
+            <text x="150" y="190" font-size="80" font-family="Arial" font-weight="bold" text-anchor="middle" fill="#FF6B6B">
+                4
+                <animateTransform
+                        attributeName="transform"
+                        type="translate"
+                        values="0 0; 0 -15; 0 0"
+                        dur="2.6s"
+                        begin="0s"
+                        repeatCount="indefinite"/>
+            </text>
+        </g>
+
+        <!-- Second digit group (0) -->
+        <g>
+            <text x="200" y="180" font-size="80" font-family="Arial" font-weight="bold" text-anchor="middle" fill="#f0f0f0">
+                0
+                <animateTransform
+                        attributeName="transform"
+                        type="translate"
+                        values="0 5; 0 -5; 0 5"
+                        dur="2.6s"
+                        begin="0.2s"
+                        repeatCount="indefinite"/>
+            </text>
+            <text x="200" y="180" font-size="80" font-family="Arial" font-weight="bold" text-anchor="middle" fill="#FF6B6B">
+                0
+                <animateTransform
+                        attributeName="transform"
+                        type="translate"
+                        values="0 5; 0 -5; 0 5"
+                        dur="2.6s"
+                        begin="0.2s"
+                        repeatCount="indefinite"/>
+            </text>
+        </g>
+
+        <!-- Third digit group (4) -->
+        <g>
+            <text x="250" y="190" font-size="80" font-family="Arial" font-weight="bold" text-anchor="middle" fill="#f0f0f0">
+                4
+                <animateTransform
+                        attributeName="transform"
+                        type="translate"
+                        values="0 0; 0 -15; 0 0"
+                        dur="2.6s"
+                        begin="0.4s"
+                        repeatCount="indefinite"/>
+            </text>
+            <text x="250" y="190" font-size="80" font-family="Arial" font-weight="bold" text-anchor="middle" fill="#FF6B6B">
+                4
+                <animateTransform
+                        attributeName="transform"
+                        type="translate"
+                        values="0 0; 0 -15; 0 0"
+                        dur="2.6s"
+                        begin="0.4s"
+                        repeatCount="indefinite"/>
+            </text>
+        </g>
+
+        <!-- Animated arrows -->
+        <g>
+            <!-- Left arrow -->
+            <path d="M50,160 L70,140 L70,150 L90,150 L90,170 L70,170 L70,180 Z" fill="#8CD2FF">
+                <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
+            </path>
+
+            <!-- Right arrow -->
+            <path d="M350,160 L330,140 L330,150 L310,150 L310,170 L330,170 L330,180 Z" fill="#8CD2FF">
+                <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/>
+            </path>
+
+            <!-- Up arrow -->
+            <path d="M200,50 L180,70 L190,70 L190,90 L210,90 L210,70 L220,70 Z" fill="#8CD2FF">
+                <animate attributeName="opacity" values="1;0.3;1" dur="1.5s" repeatCount="indefinite"/>
+            </path>
+
+            <!-- Down arrow -->
+            <path d="M200,250 L180,230 L190,230 L190,210 L210,210 L210,230 L220,230 Z" fill="#8CD2FF">
+                <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite"/>
+            </path>
+        </g>
+
+        <!-- Footprints -->
+        <g fill="#DDDDDD">
+            <!-- Left foot series -->
+            <path d="M80,100 C85,100 87,95 87,93 C87,88 85,86 80,86 C75,86 73,88 73,93 C73,95 75,100 80,100Z">
+                <animate attributeName="opacity" values="0.2;0.8;0.2" dur="3s" repeatCount="indefinite"/>
+            </path>
+            <path d="M100,140 C105,140 107,135 107,133 C107,128 105,126 100,126 C95,126 93,128 93,133 C93,135 95,140 100,140Z">
+                <animate attributeName="opacity" values="0.3;0.9;0.3" dur="3s" repeatCount="indefinite"/>
+            </path>
+
+            <!-- Right foot series -->
+            <path d="M320,100 C325,100 327,95 327,93 C327,88 325,86 320,86 C315,86 313,88 313,93 C313,95 315,100 320,100Z">
+                <animate attributeName="opacity" values="0.2;0.8;0.2" dur="3s" repeatCount="indefinite"/>
+            </path>
+            <path d="M300,140 C305,140 307,135 307,133 C307,128 305,126 300,126 C295,126 293,128 293,133 C293,135 295,140 300,140Z">
+                <animate attributeName="opacity" values="0.3;0.9;0.3" dur="3s" repeatCount="indefinite"/>
+            </path>
+        </g>
+
+        <!-- Subtle message -->
+        <text x="200" y="205" font-size="14" font-family="Arial" text-anchor="middle" fill="#999999">
+            Oops! Page not found
+        </text>
+    </svg>
+
+    <h1 style="color: #333; font-size: 24px; margin: 20px 0;">Page Not Found</h1>
+    <p style="color: #666; margin-bottom: 30px;">The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.</p>
+    <a href="/" class="back-button">Back to Homepage</a>
+</div>
