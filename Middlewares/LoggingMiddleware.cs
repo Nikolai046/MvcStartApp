@@ -3,43 +3,59 @@
 public class LoggingMiddleware
 {
     private readonly RequestDelegate _next;
+    private static readonly Lock LockObject = new();
+    private readonly string _logFilePath;
 
-    /// <summary>
-    ///  Middleware-компонент должен иметь конструктор, принимающий RequestDelegate
-    /// </summary>
-    public LoggingMiddleware(RequestDelegate next)
+    public LoggingMiddleware(RequestDelegate next, IWebHostEnvironment environment)
     {
         _next = next;
+
+        // Создаём директорию для логов при инициализации
+        var logDir = Path.Combine(environment.ContentRootPath, "Logs");
+        if (!Directory.Exists(logDir))
+            Directory.CreateDirectory(logDir);
+
+        _logFilePath = Path.Combine(logDir, "RequestLog.txt");
     }
 
-    /// <summary>
-    ///  Необходимо реализовать метод Invoke  или InvokeAsync
-    /// </summary>
     public async Task InvokeAsync(HttpContext context)
     {
-        LogConsole(context);
-        await LogFile(context);
+        // Логируем до обработки запроса
+        await LogRequestAsync(context);
 
-        // Передача запроса далее по конвейеру
-        await _next.Invoke(context);
+        // Передаем запрос дальше по пайплайну
+        await _next(context);
     }
 
     private void LogConsole(HttpContext context)
     {
-        // Для логирования данных о запросе используем свойста объекта HttpContext
-        Console.WriteLine($"[{DateTime.Now}]: New request to http://{context.Request.Host.Value + context.Request.Path}");
+        Console.WriteLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}]: New request to http://{context.Request.Host.Value + context.Request.Path}");
     }
 
-    private async Task LogFile(HttpContext context)
+    private async Task LogRequestAsync(HttpContext context)
     {
-        // Строка для публикации в лог
-        string logMessage = $"[{DateTime.Now}]: New request to http://{context.Request.Host.Value + context.Request.Path}{Environment.NewLine}";
+        // Логируем в консоль
+        LogConsole(context);
 
-        // Путь до лога (опять-таки, используем свойства IWebHostEnvironment)
-        string logFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Logs", "RequestLog.txt");
+        // Формируем сообщение для лога
+        string logMessage = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}]: New request to http://{context.Request.Host.Value + context.Request.Path}{Environment.NewLine}";
 
-        // Используем асинхронную запись в файл
-        await File.AppendAllTextAsync(logFilePath, logMessage);
+        try
+        {
+            // Используем lock для синхронизации доступа к файлу
+            lock (LockObject)
+            {
+                // Используем StreamWriter с параметром append: true
+                using (var writer = new StreamWriter(_logFilePath, append: true))
+                {
+                    writer.Write(logMessage);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            // Логируем ошибку записи в консоль, чтобы не прерывать обработку запроса
+            Console.WriteLine($"Error writing to log file: {ex.Message}");
+        }
     }
-
 }
