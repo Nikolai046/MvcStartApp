@@ -1,7 +1,7 @@
-﻿namespace MvcStartApp.Models.DB;
+﻿namespace MvcStartApp.Models.Entities;
 
 /// <summary>
-/// модель пользователя в блоге
+/// Модель пользователя в блоге
 /// </summary>
 public class User
 {

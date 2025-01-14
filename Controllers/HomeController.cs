@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using MvcStartApp.Models;
-using MvcStartApp.Models.DB;
 using MvcStartApp.Models.Repository;
 using System.Diagnostics;
+using MvcStartApp.Models.Entities;
 
 namespace MvcStartApp.Controllers
 {
@@ -21,21 +21,6 @@ namespace MvcStartApp.Controllers
 
         public async Task<IActionResult> Index()
         {
-            // Добавим создание нового пользователя
-            var newUser = new User()
-            {
-                Id = Guid.NewGuid(),
-                FirstName = "Andrey",
-                LastName = "Petrov",
-                JoinDate = DateTime.Now
-            };
-
-            // Добавим в базу
-            await _repo.AddUser(newUser);
-
-            // Выведем результат
-            Console.WriteLine($"User with id {newUser.Id}, named {newUser.FirstName} was successfully added on {newUser.JoinDate}");
-
             return View();
         }
 
@@ -61,5 +46,7 @@ namespace MvcStartApp.Controllers
 
             return View("Error"); // Можете создать страницу для других ошибок
         }
+
+
     }
 }

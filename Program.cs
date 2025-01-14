@@ -3,6 +3,7 @@ using MvcStartApp.Middlewares;
 using MvcStartApp.Models.DB;
 using MvcStartApp.Models.Repository;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Настраиваем логирование

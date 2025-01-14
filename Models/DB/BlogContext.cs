@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MvcStartApp.Models.Entities;
 
 namespace MvcStartApp.Models.DB;
 

@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MvcStartApp.Models.DB;
+using MvcStartApp.Models.Entities;
 
 namespace MvcStartApp.Models.Repository;
 
@@ -27,12 +29,14 @@ public class BlogRepository : IBlogRepository
         if (entry.State == EntityState.Detached)
             await _context.Users.AddAsync(user);
 
-        // Сохранение изенений
+        // Сохранение изменений
         await _context.SaveChangesAsync();
     }
 
-    public Task<User[]> GetUsers()
+    public async Task<User[]> GetUsers()
     {
-        throw new NotImplementedException();
+        // Получим всех активных пользователей
+        return await _context.Users.ToArrayAsync();
     }
+
 }

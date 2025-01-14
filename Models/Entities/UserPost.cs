@@ -1,4 +1,4 @@
-﻿namespace MvcStartApp.Models.DB;
+﻿namespace MvcStartApp.Models.Entities;
 
 /// <summary>
 ///  Модель поста в блоге
