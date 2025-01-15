@@ -1,16 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using MvcStartApp.Models.DB;
 using MvcStartApp.Models.Entities;
 using MvcStartApp.Models.Repository;
 
 namespace MvcStartApp.Controllers;
 
+// ReSharper disable once HollowTypeName
 public class UsersController : Controller
 {
     private readonly IBlogRepository _repo;
     private readonly BlogContext _context;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public UsersController(IBlogRepository repo, BlogContext context)
     {
         _repo = repo;
