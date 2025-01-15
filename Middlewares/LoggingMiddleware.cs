@@ -1,14 +1,24 @@
-﻿namespace MvcStartApp.Middlewares;
+﻿using MvcStartApp.Models.DB;
+using MvcStartApp.Models.Entities;
+using MvcStartApp.Models.Repository;
+
+namespace MvcStartApp.Middlewares;
 
 public class LoggingMiddleware
 {
     private readonly RequestDelegate _next;
-    private static readonly Lock LockObject = new();
+    private static readonly object LockObject = new();
     private readonly string _logFilePath;
+    private readonly IServiceProvider _serviceProvider;
 
-    public LoggingMiddleware(RequestDelegate next, IWebHostEnvironment environment)
+    // Добавляем множество для отслеживания обработанных запросов
+    private static readonly HashSet<string> ProcessedRequests = new();
+    private static readonly Lock ProcessedRequestsLock = new();
+
+    public LoggingMiddleware(RequestDelegate next, IWebHostEnvironment environment, IServiceProvider serviceProvider)
     {
         _next = next;
+        _serviceProvider = serviceProvider;
 
         // Создаём директорию для логов при инициализации
         var logDir = Path.Combine(environment.ContentRootPath, "Logs");
@@ -20,42 +30,100 @@ public class LoggingMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        // Логируем до обработки запроса
-        await LogRequestAsync(context);
+        // Создаем уникальный идентификатор запроса
+        var requestId = $"{context.TraceIdentifier}_{DateTime.Now.Ticks}";
 
-        // Передаем запрос дальше по пайплайну
-        await _next(context);
-    }
+        // Проверяем, не обрабатывали ли мы уже этот запрос
+        bool isNewRequest;
+        lock (ProcessedRequestsLock)
+        {
+            isNewRequest = ProcessedRequests.Add(requestId);
 
-    private void LogConsole(HttpContext context)
-    {
-        Console.WriteLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}]: New request to http://{context.Request.Host.Value + context.Request.Path}");
-    }
+            // Очищаем старые записи (старше 1 минуты)
+            var oldRequests = ProcessedRequests
+                .Where(x => x.Split('_').Length > 1 &&
+                           long.Parse(x.Split('_')[1]) < DateTime.Now.AddMinutes(-1).Ticks)
+                .ToList();
 
-    private async Task LogRequestAsync(HttpContext context)
-    {
-        // Логируем в консоль
-        LogConsole(context);
+            foreach (var old in oldRequests)
+            {
+                ProcessedRequests.Remove(old);
+            }
+        }
 
-        // Формируем сообщение для лога
-        string logMessage = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}]: New request to http://{context.Request.Host.Value + context.Request.Path}{Environment.NewLine}";
+        if (!isNewRequest)
+        {
+            await _next(context);
+            return;
+        }
 
         try
         {
-            // Используем lock для синхронизации доступа к файлу
-            lock (LockObject)
+            // Сохраняем информацию о запросе
+            var requestTime = DateTime.Now;
+            var requestUrl = $"http://{context.Request.Host.Value + context.Request.Path}";
+            var logMessage = $"[{requestTime:yyyy-MM-dd HH:mm:ss}]: New request to {requestUrl}{Environment.NewLine}";
+
+            // Выполняем все операции логирования последовательно
+            // Логируем в консоль
+            Console.WriteLine(logMessage);
+
+            // Логируем в файл
+            await LogToFileAsync(logMessage);
+
+            // Логируем в базу данных
+            using (var scope = _serviceProvider.CreateScope())
             {
-                // Используем StreamWriter с параметром append: true
-                using (var writer = new StreamWriter(_logFilePath, append: true))
-                {
-                    writer.Write(logMessage);
-                }
+                await LogToDatabaseAsync(scope.ServiceProvider, requestUrl, requestTime);
             }
+
+            // Передаем запрос дальше по пайплайну
+            await _next(context);
         }
         catch (Exception ex)
         {
-            // Логируем ошибку записи в консоль, чтобы не прерывать обработку запроса
+            Console.WriteLine($"Error in middleware: {ex.Message}");
+            await _next(context);
+        }
+    }
+
+    private async Task LogToFileAsync(string message)
+    {
+        try
+        {
+            // Используем async/await для записи в файл
+            await Task.Run(() =>
+            {
+                lock (LockObject)
+                {
+                    File.AppendAllText(_logFilePath, message);
+                }
+            });
+        }
+        catch (Exception ex)
+        {
             Console.WriteLine($"Error writing to log file: {ex.Message}");
+        }
+    }
+
+    private async Task LogToDatabaseAsync(IServiceProvider scopedServices, string url, DateTime requestTime)
+    {
+        try
+        {
+            var repo = scopedServices.GetRequiredService<IRequestRepository>();
+
+            var request = new Request
+            {
+                Id = Guid.NewGuid(),
+                Date = requestTime,
+                Url = url
+            };
+
+            await repo.AddRequest(request);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error writing to database: {ex.Message}");
         }
     }
 }
