@@ -1,5 +1,4 @@
-﻿using MvcStartApp.Models.DB;
-using MvcStartApp.Models.Entities;
+﻿using MvcStartApp.Models.Entities;
 using MvcStartApp.Models.Repository;
 
 namespace MvcStartApp.Middlewares;
@@ -12,7 +11,7 @@ public class LoggingMiddleware
     private readonly IServiceProvider _serviceProvider;
 
     // Добавляем множество для отслеживания обработанных запросов
-    private static readonly HashSet<string> ProcessedRequests = new();
+    private static readonly HashSet<long> ProcessedRequestTimes = [];
     private static readonly Lock ProcessedRequestsLock = new();
 
     public LoggingMiddleware(RequestDelegate next, IWebHostEnvironment environment, IServiceProvider serviceProvider)
@@ -30,25 +29,18 @@ public class LoggingMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        // Создаем уникальный идентификатор запроса
-        var requestId = $"{context.TraceIdentifier}_{DateTime.Now.Ticks}";
+        // Используем только временную метку для идентификации запроса
+        var requestTicks = DateTime.Now.Ticks;
 
-        // Проверяем, не обрабатывали ли мы уже этот запрос
+        // Проверяем уникальность запроса
         bool isNewRequest;
         lock (ProcessedRequestsLock)
         {
-            isNewRequest = ProcessedRequests.Add(requestId);
+            isNewRequest = ProcessedRequestTimes.Add(requestTicks);
 
             // Очищаем старые записи (старше 1 минуты)
-            var oldRequests = ProcessedRequests
-                .Where(x => x.Split('_').Length > 1 &&
-                           long.Parse(x.Split('_')[1]) < DateTime.Now.AddMinutes(-1).Ticks)
-                .ToList();
-
-            foreach (var old in oldRequests)
-            {
-                ProcessedRequests.Remove(old);
-            }
+            var cutoffTime = DateTime.Now.AddMinutes(-1).Ticks;
+            ProcessedRequestTimes.RemoveWhere(ticks => ticks < cutoffTime);
         }
 
         if (!isNewRequest)
@@ -64,9 +56,8 @@ public class LoggingMiddleware
             var requestUrl = $"http://{context.Request.Host.Value + context.Request.Path}";
             var logMessage = $"[{requestTime:yyyy-MM-dd HH:mm:ss}]: New request to {requestUrl}{Environment.NewLine}";
 
-            // Выполняем все операции логирования последовательно
             // Логируем в консоль
-            Console.WriteLine(logMessage);
+            Console.WriteLine($"\n{logMessage}");
 
             // Логируем в файл
             await LogToFileAsync(logMessage);
@@ -91,7 +82,6 @@ public class LoggingMiddleware
     {
         try
         {
-            // Используем async/await для записи в файл
             await Task.Run(() =>
             {
                 lock (LockObject)
