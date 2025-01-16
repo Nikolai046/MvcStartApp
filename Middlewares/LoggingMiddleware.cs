@@ -12,6 +12,7 @@ public class LoggingMiddleware
 
     // Добавляем множество для отслеживания обработанных запросов
     private static readonly HashSet<long> ProcessedRequestTimes = [];
+
     private static readonly Lock ProcessedRequestsLock = new();
 
     public LoggingMiddleware(RequestDelegate next, IWebHostEnvironment environment, IServiceProvider serviceProvider)

@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using MvcStartApp.Models;
 using MvcStartApp.Models.Repository;
 using System.Diagnostics;
-using MvcStartApp.Models.Entities;
 
 namespace MvcStartApp.Controllers
 {
@@ -46,7 +45,5 @@ namespace MvcStartApp.Controllers
 
             return View("Error"); // ћожете создать страницу дл€ других ошибок
         }
-
-
     }
 }

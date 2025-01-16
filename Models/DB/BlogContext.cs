@@ -25,6 +25,7 @@ public sealed class BlogContext : DbContext
         _loggerFactory = loggerFactory;
         Database.EnsureCreated();
     }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         // Добавляем логгер в контекст

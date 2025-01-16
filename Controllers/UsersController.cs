@@ -37,6 +37,7 @@ public class UsersController : Controller
         await _repo.AddUser(newUser);
         return View(newUser);
     }
+
     //[HttpPost]
     //public async Task<IActionResult> Register(User user)
     //{
@@ -52,5 +53,4 @@ public class UsersController : Controller
     //    await _context.SaveChangesAsync();
     //    return Content($"Registration successful, {user.FirstName}");
     //}
-
 }

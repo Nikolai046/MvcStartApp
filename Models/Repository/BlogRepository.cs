@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using MvcStartApp.Models.DB;
 using MvcStartApp.Models.Entities;
 
@@ -8,6 +7,7 @@ namespace MvcStartApp.Models.Repository;
 public interface IBlogRepository
 {
     Task AddUser(User user);
+
     Task<User[]> GetUsers();
 }
 
@@ -38,5 +38,4 @@ public class BlogRepository : IBlogRepository
         // Получим всех активных пользователей
         return await _context.Users.ToArrayAsync();
     }
-
 }

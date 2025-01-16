@@ -4,12 +4,13 @@ using MvcStartApp.Models.Entities;
 
 namespace MvcStartApp.Models.Repository;
 
-
 public interface IRequestRepository
 {
     Task AddRequest(Request request);
+
     Task<Request[]> GetRequests();
 }
+
 public class RequestRepository : IRequestRepository
 {
     private readonly BlogContext _context;
@@ -18,6 +19,7 @@ public class RequestRepository : IRequestRepository
     {
         _context = context;
     }
+
     public async Task AddRequest(Request request)
     {
         // Добавление лога

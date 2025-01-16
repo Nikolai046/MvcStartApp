@@ -3,7 +3,6 @@ using MvcStartApp.Middlewares;
 using MvcStartApp.Models.DB;
 using MvcStartApp.Models.Repository;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Настраиваем логирование
@@ -27,8 +26,7 @@ builder.Services.AddDbContext<BlogContext>((serviceProvider, options) =>
 
 // регистрация сервиса репозитория для взаимодействия с базой данных
 builder.Services.AddScoped<IBlogRepository, BlogRepository>();
-builder.Services.AddScoped< IRequestRepository, RequestRepository>();
-
+builder.Services.AddScoped<IRequestRepository, RequestRepository>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -59,6 +57,5 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
-
 
 app.Run();
